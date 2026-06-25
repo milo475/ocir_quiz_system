@@ -20,7 +20,11 @@ export default function QuizPage({ subject, level, onBack }) {
       .eq("subject", subject)
       .eq("level", level)
       .then(({ data }) => {
-        setQuestions(data || []);
+        const shuffled = (data || []).map(q => ({
+          ...q,
+          options: [...q.options].sort(() => Math.random() - 0.5)
+        }));
+        setQuestions(shuffled);
         setLoading(false);
       });
   }, [subject, level]);
