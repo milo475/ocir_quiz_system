@@ -59,7 +59,7 @@ function MobileMenu({ onClose, onNavigate }) {
   );
 }
 
-export default function HeroSection({ onNavigate }) {
+export default function HeroSection({ onNavigate, user, onLogin, onLogout }) {
   const [menuOpen, setMenuOpen] = useState(false);
 
   const handleNav = (link) => {
@@ -79,8 +79,13 @@ export default function HeroSection({ onNavigate }) {
             {NAV_LINKS.map((link, i) => (
               <motion.a key={link} href="#" onClick={() => handleNav(link)} className="text-sm font-semibold tracking-widest uppercase text-black cursor-pointer" {...fadeDown(i + 1)}>{link}</motion.a>
             ))}
+            {user ? (
+              <motion.button onClick={onLogout} className="text-sm font-semibold tracking-widest uppercase text-black cursor-pointer" {...fadeDown(NAV_LINKS.length + 1)}>Гарах</motion.button>
+            ) : (
+              <motion.button onClick={onLogin} className="text-sm font-semibold tracking-widest uppercase cursor-pointer" style={{ color: ACCENT }} {...fadeDown(NAV_LINKS.length + 1)}>Нэвтрэх</motion.button>
+            )}
           </div>
-          <motion.button onClick={() => setMenuOpen(true)} className="w-9 h-9 rounded-full bg-black flex flex-col items-center justify-center gap-1" {...fadeDown(5)}>
+          <motion.button onClick={() => setMenuOpen(true)} className="w-9 h-9 rounded-full bg-black flex flex-col items-center justify-center gap-1 md:hidden" {...fadeDown(5)}>
             <span className="w-4 h-0.5 bg-white" />
             <span className="w-4 h-0.5 bg-white" />
             <span className="w-4 h-0.5 bg-white" />
