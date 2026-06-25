@@ -4,7 +4,7 @@ import { ArrowUpRight, X } from "lucide-react";
 
 const VIDEO_URL = "https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260517_222138_3e3205be-3364-417b-a64a-bfe087acbec4.mp4";
 const ACCENT = "#5E0ED7";
-const NAV_LINKS = ["Story", "Сэдэв", "Studios", "Feedback"];
+const NAV_LINKS = ["Story", "Сэдэв", "Хичээл", "Feedback"];
 const STATS = [
   { num: 300, label: "CRAFTED\nBRANDS" },
   { num: 200, label: "DIGITAL\nPRODUCTS" },
