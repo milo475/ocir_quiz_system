@@ -1,11 +1,55 @@
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { ArrowLeft } from "lucide-react";
+import { supabase } from "./supabaseClient";
 
 const ACCENT = "#5E0ED7";
 
 const LESSONS = ["HTML", "CSS", "Python", "JavaScript", "Java", "React", "Django"];
 
 export default function LessonPage({ onBack }) {
+  const [selected, setSelected] = useState(null);
+  const [content, setContent] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!selected) return;
+    setLoading(true);
+    supabase
+      .from("lessons")
+      .select("*")
+      .eq("subject", selected)
+      .then(({ data }) => {
+        setContent(data || []);
+        setLoading(false);
+      });
+  }, [selected]);
+
+  if (selected) {
+    return (
+      <section className="min-h-screen bg-white py-16 px-5 sm:px-8 md:px-12">
+        <button onClick={() => setSelected(null)} className="flex items-center gap-2 mb-8 text-sm font-semibold uppercase tracking-widest hover:opacity-70">
+          <ArrowLeft size={18} /> Буцах
+        </button>
+        <h2 className="text-3xl sm:text-4xl font-semibold mb-8" style={{ color: ACCENT }}>{selected} хичээлүүд</h2>
+        {loading ? (
+          <p className="text-gray-500">Уншиж байна...</p>
+        ) : content.length === 0 ? (
+          <p className="text-gray-500">Хичээл олдсонгүй.</p>
+        ) : (
+          <div className="flex flex-col gap-6 max-w-4xl">
+            {content.map((lesson) => (
+              <div key={lesson.id} className="border border-gray-200 rounded-xl p-6">
+                <h3 className="text-xl font-semibold mb-3">{lesson.title}</h3>
+                <div className="text-gray-700 whitespace-pre-wrap">{lesson.content}</div>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+    );
+  }
+
   return (
     <section className="min-h-screen bg-white py-16 px-5 sm:px-8 md:px-12">
       <button onClick={onBack} className="flex items-center gap-2 mb-8 text-sm font-semibold uppercase tracking-widest hover:opacity-70">
@@ -35,6 +79,7 @@ export default function LessonPage({ onBack }) {
               {name}
             </h3>
             <button
+              onClick={() => setSelected(name)}
               className="w-full px-4 py-3 rounded-lg font-medium text-sm text-white tracking-wide transition-colors"
               style={{ backgroundColor: ACCENT }}
             >
