@@ -47,7 +47,7 @@ function MobileMenu({ onClose, onNavigate }) {
       </div>
       <nav className="flex flex-col gap-8 mt-16">
         {NAV_LINKS.map((link) => (
-          <a key={link} href="#" onClick={() => link === "Сэдэв" && onNavigate("expertise")} className="text-3xl font-semibold tracking-widest uppercase text-black">{link}</a>
+          <a key={link} href="#" onClick={() => { if (link === "Сэдэв") onNavigate("expertise"); if (link === "Хичээл") onNavigate("lesson"); }} className="text-3xl font-semibold tracking-widest uppercase text-black">{link}</a>
         ))}
       </nav>
       <div className="mt-auto">
@@ -64,6 +64,7 @@ export default function HeroSection({ onNavigate }) {
 
   const handleNav = (link) => {
     if (link === "Сэдэв") onNavigate("expertise");
+    if (link === "Хичээл") onNavigate("lesson");
   };
 
   return (
