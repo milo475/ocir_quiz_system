@@ -1,0 +1,506 @@
+Django бол Python хэл дээр суурилсан, нээлттэй эхийн вэб framework юм. 2005 онд анх гарсан бөгөөд "The web framework for perfectionists with deadlines" гэсэн уриатай. Django нь MTV (Model-Template-View) архитектур ашигладаг бөгөөд Instagram, Pinterest, Spotify, Mozilla зэрэг том компаниуд ашигладаг.
+
+=== ҮНДСЭН ОЙЛГОЛТ ===
+
+1. Django суулгах ба төсөл үүсгэх
+
+pip install django
+django-admin startproject myproject
+cd myproject
+python manage.py runserver
+
+Энэ нь http://127.0.0.1:8000/ дээр сервер эхлүүлнэ.
+
+App үүсгэх:
+
+python manage.py startapp blog
+
+settings.py дотор app бүртгэх:
+
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'blog',  # шинэ app
+]
+
+2. MTV архитектур
+
+Model - Өгөгдлийн бүтэц (Database table)
+Template - HTML загвар (Хэрэглэгчид харуулах)
+View - Бизнес логик (Model ба Template холбох)
+
+URL -> View -> Model (DB) -> Template -> Response
+
+3. URL routing
+
+myproject/urls.py:
+
+from django.contrib import admin
+from django.urls import path, include
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('blog/', include('blog.urls')),
+]
+
+blog/urls.py:
+
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    path('', views.post_list, name='post_list'),
+    path('<int:pk>/', views.post_detail, name='post_detail'),
+    path('create/', views.post_create, name='post_create'),
+]
+
+4. Views - Хүсэлт боловсруулах
+
+Function-based view:
+
+from django.shortcuts import render, get_object_or_404, redirect
+from .models import Post
+
+def post_list(request):
+    posts = Post.objects.all().order_by('-created_at')
+    return render(request, 'blog/post_list.html', {'posts': posts})
+
+def post_detail(request, pk):
+    post = get_object_or_404(Post, pk=pk)
+    return render(request, 'blog/post_detail.html', {'post': post})
+
+5. Models - Өгөгдлийн бүтэц
+
+from django.db import models
+from django.contrib.auth.models import User
+
+class Post(models.Model):
+    title = models.CharField(max_length=200)
+    content = models.TextField()
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    published = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.title
+
+    class Meta:
+        ordering = ['-created_at']
+
+class Comment(models.Model):
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')
+    author = models.CharField(max_length=100)
+    text = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.author} - {self.post.title}"
+
+Migration хийх:
+
+python manage.py makemigrations
+python manage.py migrate
+
+6. Django ORM - Өгөгдөлтэй ажиллах
+
+Бүх объект авах:
+posts = Post.objects.all()
+
+Шүүх:
+published = Post.objects.filter(published=True)
+drafts = Post.objects.filter(published=False)
+recent = Post.objects.filter(created_at__year=2024)
+
+Нэг объект:
+post = Post.objects.get(pk=1)
+
+Үүсгэх:
+post = Post.objects.create(
+    title="Шинэ нийтлэл",
+    content="Агуулга...",
+    author=request.user
+)
+
+Шинэчлэх:
+post.title = "Шинэ гарчиг"
+post.save()
+
+Устгах:
+post.delete()
+
+Холбоотой объект:
+post.comments.all()
+Post.objects.filter(comments__author="Бат")
+
+Aggregation:
+from django.db.models import Count, Avg
+Post.objects.aggregate(нийт=Count('id'))
+
+7. Templates - HTML загвар
+
+blog/templates/blog/post_list.html:
+
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Нийтлэлүүд</h1>
+{% for post in posts %}
+  <article>
+    <h2><a href="{% url 'post_detail' post.pk %}">{{ post.title }}</a></h2>
+    <p>{{ post.content|truncatewords:30 }}</p>
+    <small>{{ post.created_at|date:"Y-m-d" }} | {{ post.author }}</small>
+  </article>
+{% empty %}
+  <p>Нийтлэл байхгүй байна.</p>
+{% endfor %}
+{% endblock %}
+
+Template tags:
+- {% if %} {% elif %} {% else %} {% endif %}
+- {% for item in list %} {% endfor %}
+- {% include 'partial.html' %}
+- {% url 'name' arg %}
+- {% csrf_token %}
+
+Template filters:
+- {{ text|truncatewords:20 }}
+- {{ date|date:"Y-m-d" }}
+- {{ text|linebreaks }}
+- {{ number|floatformat:2 }}
+
+8. Forms - Маягт
+
+from django import forms
+from .models import Post
+
+class PostForm(forms.ModelForm):
+    class Meta:
+        model = Post
+        fields = ['title', 'content', 'published']
+        widgets = {
+            'title': forms.TextInput(attrs={'class': 'form-control'}),
+            'content': forms.Textarea(attrs={'class': 'form-control', 'rows': 5}),
+        }
+
+View дотор:
+
+def post_create(request):
+    if request.method == 'POST':
+        form = PostForm(request.POST)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.author = request.user
+            post.save()
+            return redirect('post_detail', pk=post.pk)
+    else:
+        form = PostForm()
+    return render(request, 'blog/post_form.html', {'form': form})
+
+Template:
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Хадгалах</button>
+</form>
+
+=== ДУНД ТҮВШИН ===
+
+9. Class-Based Views (CBV)
+
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.urls import reverse_lazy
+
+class PostListView(ListView):
+    model = Post
+    template_name = 'blog/post_list.html'
+    context_object_name = 'posts'
+    paginate_by = 10
+
+    def get_queryset(self):
+        return Post.objects.filter(published=True)
+
+class PostDetailView(DetailView):
+    model = Post
+    template_name = 'blog/post_detail.html'
+
+class PostCreateView(CreateView):
+    model = Post
+    form_class = PostForm
+    template_name = 'blog/post_form.html'
+
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        return super().form_valid(form)
+
+class PostDeleteView(DeleteView):
+    model = Post
+    success_url = reverse_lazy('post_list')
+
+10. Authentication - Нэвтрэлт
+
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
+
+@login_required
+def profile(request):
+    return render(request, 'accounts/profile.html')
+
+class PostCreateView(LoginRequiredMixin, CreateView):
+    model = Post
+    form_class = PostForm
+
+urls.py:
+
+from django.contrib.auth import views as auth_views
+
+urlpatterns = [
+    path('login/', auth_views.LoginView.as_view(), name='login'),
+    path('logout/', auth_views.LogoutView.as_view(), name='logout'),
+]
+
+Бүртгэл:
+
+from django.contrib.auth.forms import UserCreationForm
+
+class RegisterView(CreateView):
+    form_class = UserCreationForm
+    template_name = 'accounts/register.html'
+    success_url = reverse_lazy('login')
+
+11. Static ба Media файлууд
+
+settings.py:
+
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [BASE_DIR / 'static']
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
+Template дотор:
+
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+<img src="{% static 'images/logo.png' %}">
+
+Зураг upload хийх model:
+
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    avatar = models.ImageField(upload_to='avatars/', blank=True)
+    bio = models.TextField(blank=True)
+
+12. Middleware
+
+class TimingMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        import time
+        start = time.time()
+        response = self.get_response(request)
+        duration = time.time() - start
+        response['X-Response-Time'] = f"{duration:.4f}s"
+        return response
+
+settings.py:
+
+MIDDLEWARE = [
+    ...
+    'myproject.middleware.TimingMiddleware',
+]
+
+=== АХИСАН ТҮВШИН ===
+
+13. Django REST Framework (DRF)
+
+pip install djangorestframework
+
+serializers.py:
+
+from rest_framework import serializers
+from .models import Post
+
+class PostSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Post
+        fields = ['id', 'title', 'content', 'author', 'created_at']
+        read_only_fields = ['author', 'created_at']
+
+views.py:
+
+from rest_framework import viewsets, permissions
+
+class PostViewSet(viewsets.ModelViewSet):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
+
+urls.py:
+
+from rest_framework.routers import DefaultRouter
+
+router = DefaultRouter()
+router.register('posts', PostViewSet)
+
+urlpatterns = [
+    path('api/', include(router.urls)),
+]
+
+14. Signals - Дохио
+
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from django.contrib.auth.models import User
+
+@receiver(post_save, sender=User)
+def create_profile(sender, instance, created, **kwargs):
+    if created:
+        Profile.objects.create(user=instance)
+
+@receiver(post_save, sender=Post)
+def notify_subscribers(sender, instance, created, **kwargs):
+    if created and instance.published:
+        send_notification(instance)
+
+15. Caching
+
+settings.py:
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+        'LOCATION': 'redis://127.0.0.1:6379',
+    }
+}
+
+View дээр cache:
+
+from django.views.decorators.cache import cache_page
+
+@cache_page(60 * 15)  # 15 минут cache
+def post_list(request):
+    posts = Post.objects.filter(published=True)
+    return render(request, 'blog/post_list.html', {'posts': posts})
+
+Low-level cache:
+
+from django.core.cache import cache
+
+def get_popular_posts():
+    key = 'popular_posts'
+    posts = cache.get(key)
+    if posts is None:
+        posts = Post.objects.filter(published=True).order_by('-views')[:10]
+        cache.set(key, posts, 60 * 60)  # 1 цаг
+    return posts
+
+16. Celery - Background Tasks
+
+pip install celery redis
+
+celery.py:
+
+from celery import Celery
+app = Celery('myproject', broker='redis://localhost:6379')
+app.config_from_object('django.conf:settings', namespace='CELERY')
+app.autodiscover_tasks()
+
+tasks.py:
+
+from celery import shared_task
+from django.core.mail import send_mail
+
+@shared_task
+def send_welcome_email(user_id):
+    user = User.objects.get(id=user_id)
+    send_mail(
+        'Тавтай морил!',
+        f'Сайн байна уу {user.username}, бүртгэл амжилттай!',
+        'noreply@example.com',
+        [user.email],
+    )
+
+View дотор дуудах:
+
+def register(request):
+    ...
+    user = form.save()
+    send_welcome_email.delay(user.id)  # Background-д ажиллана
+    ...
+
+17. Testing
+
+from django.test import TestCase, Client
+from django.urls import reverse
+from .models import Post
+
+class PostModelTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user('test', 'test@test.com', 'pass123')
+        self.post = Post.objects.create(
+            title='Тест нийтлэл',
+            content='Тест агуулга',
+            author=self.user,
+            published=True
+        )
+
+    def test_post_creation(self):
+        self.assertEqual(self.post.title, 'Тест нийтлэл')
+        self.assertEqual(str(self.post), 'Тест нийтлэл')
+
+    def test_post_list_view(self):
+        client = Client()
+        response = client.get(reverse('post_list'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Тест нийтлэл')
+
+18. Deployment - Байршуулах
+
+requirements.txt:
+
+Django>=4.2
+gunicorn
+psycopg2-binary
+whitenoise
+python-decouple
+
+settings.py (production):
+
+from decouple import config
+
+DEBUG = False
+SECRET_KEY = config('SECRET_KEY')
+ALLOWED_HOSTS = ['yourdomain.com']
+
+MIDDLEWARE = [
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+    ...
+]
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': config('DB_NAME'),
+        'USER': config('DB_USER'),
+        'PASSWORD': config('DB_PASSWORD'),
+        'HOST': config('DB_HOST'),
+    }
+}
+
+Gunicorn ажиллуулах:
+
+gunicorn myproject.wsgi:application --bind 0.0.0.0:8000
+
+Дүгнэлт: Django бол Python-ий хамгийн хүчирхэг вэб framework бөгөөд ORM, admin panel, authentication, form handling, REST API зэрэг бүрэн хэрэгслүүдтэй. "Batteries included" философитой учраас бараг бүх зүйл суулгацтай ирдэг. Жижиг блогоос эхлээд том enterprise систем хүртэл бүтээх боломжтой.
