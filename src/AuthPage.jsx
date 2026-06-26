@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { supabase } from "./supabaseClient";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Eye, EyeOff } from "lucide-react";
 
 const ACCENT = "#5E0ED7";
 
@@ -11,6 +11,7 @@ export default function AuthPage({ onBack, onAuth }) {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -53,25 +54,35 @@ export default function AuthPage({ onBack, onAuth }) {
             required
             className="px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-purple-400"
           />
-          <input
-            type="password"
-            placeholder="Нууц үг"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            minLength={6}
-            className="px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-purple-400"
-          />
-          {!isLogin && (
+          <div className="relative">
             <input
-              type="password"
-              placeholder="Нууц үг давтах"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
+              type={showPassword ? "text" : "password"}
+              placeholder="Нууц үг"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               required
               minLength={6}
-              className="px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-purple-400"
+              className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-purple-400 pr-10"
             />
+            <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          </div>
+          {!isLogin && (
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                placeholder="Нууц үг давтах"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+                minLength={6}
+                className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-purple-400 pr-10"
+              />
+              <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
           )}
           {error && <p className="text-red-500 text-sm">{error}</p>}
           <button
