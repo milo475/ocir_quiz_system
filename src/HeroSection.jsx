@@ -1,15 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { ArrowUpRight, X } from "lucide-react";
+import { supabase } from "./supabaseClient";
 
 const VIDEO_URL = "https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260517_222138_3e3205be-3364-417b-a64a-bfe087acbec4.mp4";
 const ACCENT = "#5E0ED7";
 const NAV_LINKS = ["Story", "Сэдэв", "Хичээл", "Feedback"];
-const STATS = [
-  { num: 300, label: "CRAFTED\nBRANDS" },
-  { num: 200, label: "DIGITAL\nPRODUCTS" },
-  { num: 100, label: "VENTURES\nFUNDED" },
-];
+const STATS_LABELS = ["НИЙТ\nСЭДЭВ", "НИЙТ\nХИЧЭЭЛ"];
 const HEADING_WORDS = ["Ocir", "Quiz", "System"];
 const ease = [0.22, 1, 0.36, 1];
 
@@ -61,6 +58,17 @@ function MobileMenu({ onClose, onNavigate }) {
 
 export default function HeroSection({ onNavigate, user, onLogin, onLogout }) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [stats, setStats] = useState([0, 0]);
+
+  useEffect(() => {
+    Promise.all([
+      supabase.from("quizzes").select("subject"),
+      supabase.from("lessons").select("id", { count: "exact", head: true }),
+    ]).then(([quizRes, lessonRes]) => {
+      const subjects = new Set((quizRes.data || []).map(q => q.subject));
+      setStats([subjects.size, lessonRes.count || 0]);
+    });
+  }, []);
 
   const handleNav = (link) => {
     if (link === "Сэдэв") onNavigate("expertise");
@@ -95,13 +103,13 @@ export default function HeroSection({ onNavigate, user, onLogin, onLogout }) {
         {/* Stats */}
         <div className="flex-1 flex items-center justify-end px-5 sm:px-8 md:px-12 py-8 md:py-0">
           <div className="flex gap-5 sm:gap-8 md:gap-10">
-            {STATS.map((stat, i) => (
-              <motion.div key={stat.num} className="text-right" {...fadeUp(i + 2)}>
+            {STATS_LABELS.map((label, i) => (
+              <motion.div key={label} className="text-right" {...fadeUp(i + 2)}>
                 <p style={{ fontSize: "clamp(1.5rem, 5vw, 3.5rem)" }} className="font-semibold leading-none">
                   <span style={{ color: ACCENT, fontSize: "0.5em" }}>+</span>
-                  <span className="text-black">{stat.num}</span>
+                  <span className="text-black">{stats[i]}</span>
                 </p>
-                <p className="text-[10px] sm:text-xs md:text-sm font-semibold tracking-widest uppercase text-black whitespace-pre-line leading-tight mt-1">{stat.label}</p>
+                <p className="text-[10px] sm:text-xs md:text-sm font-semibold tracking-widest uppercase text-black whitespace-pre-line leading-tight mt-1">{label}</p>
               </motion.div>
             ))}
           </div>
