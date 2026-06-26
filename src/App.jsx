@@ -9,16 +9,27 @@ import AuthPage from "./AuthPage";
 export default function App() {
   const [page, setPage] = useState("home");
   const [quiz, setQuiz] = useState(null);
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(() => {
+    const saved = localStorage.getItem("user");
+    return saved ? JSON.parse(saved) : null;
+  });
   const [showAuth, setShowAuth] = useState(false);
   const [pendingQuiz, setPendingQuiz] = useState(null);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
-      setUser(data.session?.user || null);
+      if (data.session?.user) {
+        setUser(data.session.user);
+        localStorage.setItem("user", JSON.stringify(data.session.user));
+      }
     });
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user || null);
+      if (session?.user) {
+        setUser(session.user);
+        localStorage.setItem("user", JSON.stringify(session.user));
+      } else if (!localStorage.getItem("user")) {
+        setUser(null);
+      }
     });
     return () => listener.subscription.unsubscribe();
   }, []);
