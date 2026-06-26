@@ -45,6 +45,7 @@ export default function App() {
 
   const handleAuth = (authedUser) => {
     setUser(authedUser);
+    localStorage.setItem("user", JSON.stringify(authedUser));
     setShowAuth(false);
     if (pendingQuiz) {
       setQuiz(pendingQuiz);
@@ -55,6 +56,7 @@ export default function App() {
   const handleLogout = async () => {
     await supabase.auth.signOut();
     setUser(null);
+    localStorage.removeItem("user");
   };
 
   if (showAuth) return <AuthPage onBack={() => { setShowAuth(false); setPendingQuiz(null); }} onAuth={handleAuth} />;
