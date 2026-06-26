@@ -8,12 +8,17 @@ export default function AuthPage({ onBack, onAuth }) {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    if (!isLogin && password !== confirmPassword) {
+      setError("Нууц үг таарахгүй байна");
+      return;
+    }
     setLoading(true);
 
     const { data, error: err } = isLogin
@@ -57,6 +62,17 @@ export default function AuthPage({ onBack, onAuth }) {
             minLength={6}
             className="px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-purple-400"
           />
+          {!isLogin && (
+            <input
+              type="password"
+              placeholder="Нууц үг давтах"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+              minLength={6}
+              className="px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-purple-400"
+            />
+          )}
           {error && <p className="text-red-500 text-sm">{error}</p>}
           <button
             type="submit"
