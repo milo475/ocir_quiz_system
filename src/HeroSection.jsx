@@ -33,7 +33,7 @@ function Logo() {
   );
 }
 
-function MobileMenu({ onClose, onNavigate }) {
+function MobileMenu({ onClose, onNavigate, user, onLogin, onLogout }) {
   return (
     <div className="fixed inset-0 z-50 bg-white flex flex-col px-5 sm:px-8 md:px-12 pt-5 md:pt-6 pb-8">
       <div className="flex items-center justify-between">
@@ -44,11 +44,16 @@ function MobileMenu({ onClose, onNavigate }) {
       </div>
       <nav className="flex flex-col gap-8 mt-16">
         {NAV_LINKS.map((link) => (
-          <a key={link} href="#" onClick={() => { if (link === "Сэдэв") onNavigate("expertise"); if (link === "Хичээл") onNavigate("lesson"); if (link === "Түүх") onNavigate("history"); }} className="text-3xl font-semibold tracking-widest uppercase text-black">{link}</a>
+          <a key={link} href="#" onClick={() => { if (link === "Сэдэв") onNavigate("expertise"); if (link === "Хичээл") onNavigate("lesson"); if (link === "Түүх") onNavigate("history"); onClose(); }} className="text-3xl font-semibold tracking-widest uppercase text-black">{link}</a>
         ))}
+        {user ? (
+          <button onClick={() => { onLogout(); onClose(); }} className="text-3xl font-semibold tracking-widest uppercase text-left" style={{ color: ACCENT }}>Гарах</button>
+        ) : (
+          <button onClick={() => { onLogin(); onClose(); }} className="text-3xl font-semibold tracking-widest uppercase text-left" style={{ color: ACCENT }}>Нэвтрэх</button>
+        )}
       </nav>
       <div className="mt-auto">
-        <a href="#" onClick={() => onNavigate("expertise")} className="flex items-center gap-2 text-xl font-semibold tracking-widest uppercase" style={{ color: ACCENT }}>
+        <a href="#" onClick={() => { onNavigate("expertise"); onClose(); }} className="flex items-center gap-2 text-xl font-semibold tracking-widest uppercase" style={{ color: ACCENT }}>
           Шалгалт эхлэх <ArrowUpRight size={22} />
         </a>
       </div>
@@ -143,7 +148,7 @@ export default function HeroSection({ onNavigate, user, onLogin, onLogout }) {
         </div>
       </div>
 
-      {menuOpen && <MobileMenu onClose={() => setMenuOpen(false)} onNavigate={onNavigate} />}
+      {menuOpen && <MobileMenu onClose={() => setMenuOpen(false)} onNavigate={onNavigate} user={user} onLogin={onLogin} onLogout={onLogout} />}
     </div>
   );
 }
