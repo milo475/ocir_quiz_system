@@ -76,25 +76,25 @@ export default function ExpertisePage({ onBack, onStartQuiz, user }) {
       </div>
 
       {history.length > 0 && (
-        <div className="max-w-6xl mx-auto mt-16">
-          <h3 className="text-2xl font-semibold mb-6">Шалгалтын түүх</h3>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm border border-gray-200 rounded-lg">
+        <div className="max-w-6xl mx-auto mt-12 sm:mt-16">
+          <h3 className="text-xl sm:text-2xl font-semibold mb-4 sm:mb-6">Шалгалтын түүх</h3>
+          <div className="overflow-x-auto -mx-5 px-5 sm:mx-0 sm:px-0">
+            <table className="w-full text-xs sm:text-sm border border-gray-200 rounded-lg min-w-[400px]">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-4 py-3 text-left">Огноо</th>
-                  <th className="px-4 py-3 text-left">Сэдэв</th>
-                  <th className="px-4 py-3 text-left">Түвшин</th>
-                  <th className="px-4 py-3 text-right">Оноо</th>
+                  <th className="px-3 sm:px-4 py-2 sm:py-3 text-left">Огноо</th>
+                  <th className="px-3 sm:px-4 py-2 sm:py-3 text-left">Сэдэв</th>
+                  <th className="px-3 sm:px-4 py-2 sm:py-3 text-left">Түвшин</th>
+                  <th className="px-3 sm:px-4 py-2 sm:py-3 text-right">Оноо</th>
                 </tr>
               </thead>
               <tbody>
                 {history.map((h) => (
                   <tr key={h.id} className="border-t border-gray-100">
-                    <td className="px-4 py-3">{new Date(h.taken_at).toLocaleString("mn-MN")}</td>
-                    <td className="px-4 py-3 font-medium">{h.subject}</td>
-                    <td className="px-4 py-3">{h.level}</td>
-                    <td className="px-4 py-3 text-right font-semibold">{h.score}/{h.total}</td>
+                    <td className="px-3 sm:px-4 py-2 sm:py-3">{new Date(h.taken_at).toLocaleString("mn-MN")}</td>
+                    <td className="px-3 sm:px-4 py-2 sm:py-3 font-medium">{h.subject}</td>
+                    <td className="px-3 sm:px-4 py-2 sm:py-3">{h.level}</td>
+                    <td className="px-3 sm:px-4 py-2 sm:py-3 text-right font-semibold">{h.score}/{h.total}</td>
                   </tr>
                 ))}
               </tbody>

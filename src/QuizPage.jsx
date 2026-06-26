@@ -73,8 +73,8 @@ export default function QuizPage({ subject, level, user, onBack }) {
     return (
       <section className="min-h-screen bg-white py-16 px-5 sm:px-8 md:px-12 flex flex-col items-center justify-center">
         <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="text-center">
-          <h2 className="text-4xl font-semibold mb-4" style={{ color: ACCENT }}>Дүн</h2>
-          <p className="text-6xl font-bold mb-2">{score}/{questions.length}</p>
+          <h2 className="text-3xl sm:text-4xl font-semibold mb-4" style={{ color: ACCENT }}>Дүн</h2>
+          <p className="text-5xl sm:text-6xl font-bold mb-2">{score}/{questions.length}</p>
           <p className="text-gray-500 mb-8">{Math.round((score / questions.length) * 100)}% зөв</p>
           <button onClick={onBack} className="px-6 py-3 rounded-lg text-white font-medium" style={{ backgroundColor: ACCENT }}>
             Буцах
@@ -117,7 +117,7 @@ export default function QuizPage({ subject, level, user, onBack }) {
                 key={option}
                 onClick={() => !selected && handleAnswer(option)}
                 disabled={!!selected}
-                className={`w-full text-left px-5 py-4 rounded-lg font-medium text-sm border transition-colors ${bg}`}
+                className={`w-full text-left px-4 sm:px-5 py-3 sm:py-4 rounded-lg font-medium text-xs sm:text-sm border transition-colors break-words ${bg}`}
               >
                 {option}
               </button>

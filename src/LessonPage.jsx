@@ -37,11 +37,11 @@ export default function LessonPage({ onBack }) {
         ) : content.length === 0 ? (
           <p className="text-gray-500">Хичээл олдсонгүй.</p>
         ) : (
-          <div className="flex flex-col gap-6 max-w-4xl">
+          <div className="flex flex-col gap-6 max-w-4xl mx-auto">
             {content.map((lesson) => (
-              <div key={lesson.id} className="border border-gray-200 rounded-xl p-6">
-                <h3 className="text-xl font-semibold mb-3">{lesson.title}</h3>
-                <div className="text-gray-700 whitespace-pre-wrap">{lesson.content}</div>
+              <div key={lesson.id} className="border border-gray-200 rounded-xl p-4 sm:p-6">
+                <h3 className="text-lg sm:text-xl font-semibold mb-3">{lesson.title}</h3>
+                <div className="text-gray-700 whitespace-pre-wrap break-words text-sm sm:text-base leading-relaxed">{lesson.content}</div>
               </div>
             ))}
           </div>
