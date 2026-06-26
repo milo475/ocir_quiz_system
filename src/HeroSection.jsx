@@ -48,8 +48,8 @@ function MobileMenu({ onClose, onNavigate }) {
         ))}
       </nav>
       <div className="mt-auto">
-        <a href="#" className="flex items-center gap-2 text-xl font-semibold tracking-widest uppercase" style={{ color: ACCENT }}>
-          Work With Us <ArrowUpRight size={22} />
+        <a href="#" onClick={() => onNavigate("expertise")} className="flex items-center gap-2 text-xl font-semibold tracking-widest uppercase" style={{ color: ACCENT }}>
+          Шалгалт эхлэх <ArrowUpRight size={22} />
         </a>
       </div>
     </div>
@@ -122,8 +122,8 @@ export default function HeroSection({ onNavigate, user, onLogin, onLogout }) {
             <motion.p className="text-[10px] sm:text-xs md:text-sm font-semibold tracking-widest uppercase text-black max-w-[130px] sm:max-w-[160px] md:max-w-xs" {...fadeUp(5)}>
               Мэдлэгээ шалгаж<br />чадвараа хөгжүүлж<br />ирээдүйгээ бүтээ
             </motion.p>
-            <motion.a href="#" className="flex items-center gap-1 text-base sm:text-xl md:text-2xl font-semibold tracking-widest uppercase whitespace-nowrap" style={{ color: ACCENT }} {...fadeUp(6)}>
-              Work With Us <ArrowUpRight className="w-[18px] h-[18px] sm:w-[22px] sm:h-[22px]" />
+            <motion.a href="#" onClick={() => onNavigate("expertise")} className="flex items-center gap-1 text-base sm:text-xl md:text-2xl font-semibold tracking-widest uppercase whitespace-nowrap" style={{ color: ACCENT }} {...fadeUp(6)}>
+              Шалгалт эхлэх <ArrowUpRight className="w-[18px] h-[18px] sm:w-[22px] sm:h-[22px]" />
             </motion.a>
           </div>
           <div className="flex items-end justify-between gap-3 sm:gap-4">
