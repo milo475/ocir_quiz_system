@@ -15,14 +15,16 @@ const TOPICS = [
   { name: "Django", levels: [] },
 ];
 
-export default function ExpertisePage({ onBack, onStartQuiz }) {
+export default function ExpertisePage({ onBack, onStartQuiz, user }) {
   const [history, setHistory] = useState([]);
 
   useEffect(() => {
-    supabase.from("quiz_history").select("*").order("taken_at", { ascending: false }).then(({ data }) => {
+    const userId = user?.id || user?.email;
+    if (!userId) return;
+    supabase.from("quiz_history").select("*").eq("user_id", userId).order("taken_at", { ascending: false }).then(({ data }) => {
       setHistory(data || []);
     });
-  }, []);
+  }, [user]);
 
   return (
     <section className="min-h-screen bg-white py-16 px-5 sm:px-8 md:px-12">

@@ -5,6 +5,7 @@ import ExpertisePage from "./ExpertisePage";
 import LessonPage from "./LessonPage";
 import QuizPage from "./QuizPage";
 import AuthPage from "./AuthPage";
+import HistoryPage from "./HistoryPage";
 
 export default function App() {
   const [page, setPage] = useState("home");
@@ -60,8 +61,9 @@ export default function App() {
   };
 
   if (showAuth) return <AuthPage onBack={() => { setShowAuth(false); setPendingQuiz(null); }} onAuth={handleAuth} />;
-  if (quiz) return <QuizPage subject={quiz.subject} level={quiz.level} onBack={() => setQuiz(null)} />;
-  if (page === "expertise") return <ExpertisePage onBack={() => setPage("home")} onStartQuiz={handleStartQuiz} />;
+  if (quiz) return <QuizPage subject={quiz.subject} level={quiz.level} user={user} onBack={() => setQuiz(null)} />;
+  if (page === "expertise") return <ExpertisePage onBack={() => setPage("home")} onStartQuiz={handleStartQuiz} user={user} />;
   if (page === "lesson") return <LessonPage onBack={() => setPage("home")} />;
+  if (page === "history") return <HistoryPage onBack={() => setPage("home")} user={user} />;
   return <HeroSection onNavigate={setPage} user={user} onLogin={() => setShowAuth(true)} onLogout={handleLogout} />;
 }

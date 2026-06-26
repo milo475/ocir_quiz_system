@@ -5,7 +5,7 @@ import { supabase } from "./supabaseClient";
 
 const ACCENT = "#5E0ED7";
 
-export default function QuizPage({ subject, level, onBack }) {
+export default function QuizPage({ subject, level, user, onBack }) {
   const [questions, setQuestions] = useState([]);
   const [current, setCurrent] = useState(0);
   const [selected, setSelected] = useState(null);
@@ -43,9 +43,9 @@ export default function QuizPage({ subject, level, onBack }) {
         setSelected(null);
       } else {
         setFinished(true);
-        supabase.from("quiz_history").insert({ subject, level, score: scoreRef.current, total: questions.length }).then(() => {
-          // 10-аас хэтэрвэл хамгийн хуучныг устгах
-          supabase.from("quiz_history").select("id").order("taken_at", { ascending: true }).then(({ data }) => {
+        const userId = user?.id || user?.email;
+        supabase.from("quiz_history").insert({ subject, level, score: scoreRef.current, total: questions.length, user_id: userId }).then(() => {
+          supabase.from("quiz_history").select("id").eq("user_id", userId).order("taken_at", { ascending: true }).then(({ data }) => {
             if (data && data.length > 10) {
               const toDelete = data.slice(0, data.length - 10).map(r => r.id);
               supabase.from("quiz_history").delete().in("id", toDelete);

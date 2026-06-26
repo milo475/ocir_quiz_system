@@ -5,7 +5,7 @@ import { supabase } from "./supabaseClient";
 
 const VIDEO_URL = "https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260517_222138_3e3205be-3364-417b-a64a-bfe087acbec4.mp4";
 const ACCENT = "#5E0ED7";
-const NAV_LINKS = ["Story", "Сэдэв", "Хичээл", "Feedback"];
+const NAV_LINKS = ["Story", "Сэдэв", "Хичээл", "Түүх"];
 const STATS_LABELS = ["НИЙТ\nСЭДЭВ", "НИЙТ\nХИЧЭЭЛ"];
 const HEADING_WORDS = ["Ocir", "Quiz", "System"];
 const ease = [0.22, 1, 0.36, 1];
@@ -44,7 +44,7 @@ function MobileMenu({ onClose, onNavigate }) {
       </div>
       <nav className="flex flex-col gap-8 mt-16">
         {NAV_LINKS.map((link) => (
-          <a key={link} href="#" onClick={() => { if (link === "Сэдэв") onNavigate("expertise"); if (link === "Хичээл") onNavigate("lesson"); }} className="text-3xl font-semibold tracking-widest uppercase text-black">{link}</a>
+          <a key={link} href="#" onClick={() => { if (link === "Сэдэв") onNavigate("expertise"); if (link === "Хичээл") onNavigate("lesson"); if (link === "Түүх") onNavigate("history"); }} className="text-3xl font-semibold tracking-widest uppercase text-black">{link}</a>
         ))}
       </nav>
       <div className="mt-auto">
@@ -73,6 +73,7 @@ export default function HeroSection({ onNavigate, user, onLogin, onLogout }) {
   const handleNav = (link) => {
     if (link === "Сэдэв") onNavigate("expertise");
     if (link === "Хичээл") onNavigate("lesson");
+    if (link === "Түүх") onNavigate("history");
   };
 
   return (
